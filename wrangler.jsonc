@@ -25,6 +25,7 @@
 		"binding": "IMAGES"
 	},
 	"vars": {
+		"TURSO_AUTH_TOKEN": "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3OTAwOTc0MzUsImlkIjoiMDFhMGNhMWUtYWMwMS03ZTU3LThkNzQtOTQ1MmQwMzM0YmIwIiwia2lkIjoiejBCV3AxWHFWM25rWXFxVUJVR2Nid3dYbDRldVJoY01INEtib09HczRXQSIsInJpZCI6IjlkY2MwOTcxLTE3ZmYtNGQxNS04YTA5LTAzYzZkZTgzYjcyNCJ9.f4gE3_gijnSJJpBtespm-8gwPWtdwF2whU0HmFEbwwEHxrG0EHgAdcUPmsh395k7PRcsqrEQkrFxyjrPfjW2DQ",
 		"TURSO_DATABASE_URL": "libsql://cockpit-db-abhidk.aws-ap-northeast-1.turso.io"
 	}
 }
