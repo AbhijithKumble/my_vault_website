@@ -1,0 +1,4 @@
+# Variables for Cloudflare Wrangler local preview (pnpm run preview)
+NEXTJS_ENV=development
+TURSO_DATABASE_URL="libsql://your-db-name.turso.io"
+TURSO_AUTH_TOKEN="your-turso-jwt-auth-token"
