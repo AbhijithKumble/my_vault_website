@@ -1,21 +1,60 @@
 import { createClient, type Client } from "@libsql/client";
 
-// Global cached client for hot reload in development and edge environments
-const globalForDb = globalThis as unknown as {
-  tursoClient?: Client;
-};
+let cachedClient: Client | null = null;
+let cachedKey: string | null = null;
+
+function resolveTursoCredentials(): { url: string; authToken?: string } {
+  let url = process.env.TURSO_DATABASE_URL;
+  let authToken = process.env.TURSO_AUTH_TOKEN;
+
+  // Cloudflare OpenNext runtime fallback
+  if (!url || !authToken) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { getCloudflareContext } = require("@opennextjs/cloudflare");
+      const ctx = getCloudflareContext();
+      if (ctx?.env) {
+        url = url || ctx.env.TURSO_DATABASE_URL;
+        authToken = authToken || ctx.env.TURSO_AUTH_TOKEN;
+      }
+    } catch {
+      // Not in Cloudflare context or during static generation
+    }
+  }
+
+  // Fallback to local SQLite file for development
+  if (!url) {
+    const isEdgeWorker =
+      typeof WebSocketPair !== "undefined" ||
+      (typeof process !== "undefined" && process.env.NODE_ENV === "production" && !process.env.NEXT_RUNTIME);
+
+    if (isEdgeWorker) {
+      throw new Error(
+        "Missing TURSO_DATABASE_URL and TURSO_AUTH_TOKEN in Cloudflare environment. " +
+        "Please go to Cloudflare Dashboard -> Settings -> Variables and Secrets and add TURSO_AUTH_TOKEN."
+      );
+    }
+    url = "file:data/vault.db";
+  }
+
+  return { url, authToken };
+}
 
 export function getDb(): Client {
-  if (!globalForDb.tursoClient) {
-    const url = process.env.TURSO_DATABASE_URL || "file:data/vault.db";
-    const authToken = process.env.TURSO_AUTH_TOKEN;
+  const { url, authToken } = resolveTursoCredentials();
+  const cacheKey = `${url}::${authToken || ""}`;
 
-    globalForDb.tursoClient = createClient({
-      url,
-      authToken,
-    });
+  if (cachedClient && cachedKey === cacheKey) {
+    return cachedClient;
   }
-  return globalForDb.tursoClient;
+
+  cachedClient = createClient({
+    url,
+    authToken,
+  });
+  cachedKey = cacheKey;
+
+  return cachedClient;
 }
 
 export const SCHEMA_DDL = `

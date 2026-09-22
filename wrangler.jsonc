@@ -23,5 +23,8 @@
 		// Enable image optimization
 		// see https://opennext.js.org/cloudflare/howtos/image
 		"binding": "IMAGES"
+	},
+	"vars": {
+		"TURSO_DATABASE_URL": "libsql://cockpit-db-abhidk.aws-ap-northeast-1.turso.io"
 	}
 }
