@@ -3,6 +3,35 @@ import { getDb } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
+export async function GET(req: Request) {
+  try {
+    const db = getDb();
+    const { searchParams } = new URL(req.url);
+    const projectId = searchParams.get("project_id");
+    const status = searchParams.get("status");
+
+    let query = "SELECT * FROM tasks WHERE 1=1";
+    const args: any[] = [];
+
+    if (projectId) {
+      query += " AND project_id = ?";
+      args.push(projectId);
+    }
+    if (status) {
+      query += " AND status = ?";
+      args.push(status);
+    }
+
+    query += " ORDER BY is_next_action DESC, priority ASC, created_at DESC";
+
+    const rs = await db.execute({ sql: query, args });
+    return NextResponse.json({ tasks: rs.rows });
+  } catch (error: any) {
+    console.error("[API Error] /api/tasks GET:", error);
+    return NextResponse.json({ error: error?.message || "Failed to fetch tasks" }, { status: 500 });
+  }
+}
+
 export async function POST(req: Request) {
   const db = getDb();
   const body = await req.json();

@@ -25,7 +25,7 @@ function resolveTursoCredentials(): { url: string; authToken?: string } {
   // Fallback to local SQLite file for development
   if (!url) {
     const isEdgeWorker =
-      typeof WebSocketPair !== "undefined" ||
+      typeof (globalThis as unknown as { WebSocketPair?: unknown }).WebSocketPair !== "undefined" ||
       (typeof process !== "undefined" && process.env.NODE_ENV === "production" && !process.env.NEXT_RUNTIME);
 
     if (isEdgeWorker) {
